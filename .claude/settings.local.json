@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la /e/projects/sabbi/hopis-fe/src/routes/\\\\\\(internal\\\\\\)/hospital-src/)",
+      "Bash(ls:*)",
+      "Bash(python3 -c \":*)",
+      "Bash(npx -y exceljs@4.4.0 --require \"const ExcelJS = require\\(''exceljs''\\); const wb = new ExcelJS.Workbook\\(\\); \\(async \\(\\) => { await wb.xlsx.readFile\\(''../../rina-inventa/resources/CVCU TATA.xlsx''\\); const ws = wb.worksheets[0]; console.log\\(''Sheet:'', ws.name\\); console.log\\(''Columns found:''\\); ws.columns.forEach\\(\\(c, i\\) => console.log\\(i+1, '':'', c.header\\)\\); console.log\\(''\\\\nFirst 15 data rows:''\\); for \\(let i = 1; i <= 15; i++\\) { const row = ws.getRow\\(i\\); const vals = []; for \\(let j = 1; j <= 13; j++\\) { vals.push\\(String\\(row.getCell\\(j\\).value || ''''\\).substring\\(0, 40\\)\\); } console.log\\(''Row'', i, '':'', vals\\); } }\\)\\(\\)\")",
+      "Bash(cat '/e/projects/sabbi/hopis-fe/src/routes/\\(internal\\)/ambulatory/appointment/+page.svelte')",
+      "Bash(cat '/e/projects/sabbi/hopis-fe/src/routes/\\(internal\\)/ambulatory/appointment/+page.ts')",
+      "Bash(cat:*)",
+      "Bash(npm list:*)",
+      "Bash(grep -r \"CVCU\\\\|TATA\\\\|column\\\\|header\" /e/projects/rina/rina-inventa --include=*.md --include=*.txt --include=*.ts --include=*.js)",
+      "Bash(find /e/projects/rina/rina-inventa -maxdepth 3 -not -path */node_modules* -not -path */.svelte-kit* -not -path */.git*)",
+      "Bash(node -e \":*)",
+      "Bash(python3:*)",
+      "Read(//e/tmp/**)",
+      "Bash(npm install:*)",
+      "Bash(node /tmp/read_headers.js)",
+      "Bash(pnpm add:*)",
+      "Bash(npx shadcn-svelte@latest add button input label select dialog table badge card alert separator scroll-area dropdown-menu tooltip -y)",
+      "Bash(npx shadcn-svelte@latest add avatar sonner -y)",
+      "Bash(pnpm build:*)",
+      "Bash(node -e \"const bcrypt = require\\('bcryptjs'\\); bcrypt.hash\\('admin123', 10\\).then\\(h => console.log\\(h\\)\\)\")",
+      "Bash(mysql:*)",
+      "Bash(where mysql:*)",
+      "Read(//c/Program Files/MySQL/**)",
+      "Read(//c/xampp/mysql/**)",
+      "Read(//c/laragon/bin/**)",
+      "Bash(node:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(curl:*)",
+      "Bash(npx svelte-check:*)"
+    ]
+  }
+}
