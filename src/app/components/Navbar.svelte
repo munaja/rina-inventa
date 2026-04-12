@@ -48,13 +48,6 @@
 				>
 					Inspeksi
 				</a>
-				<button
-					type="button"
-					onclick={() => (scanMeOpen = true)}
-					class="rounded-md px-3 py-1.5 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
-				>
-					Scan Me
-				</button>
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger>
 						{#snippet child({ props })}
@@ -80,6 +73,13 @@
 						{/each}
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>
+				<button
+					type="button"
+					onclick={() => (scanMeOpen = true)}
+					class="rounded-md px-3 py-1.5 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+				>
+					Scan Me
+				</button>
 			</div>
 			{/if}
 		</div>

@@ -220,6 +220,12 @@ export interface ToolMachineInspection {
 	inspectionDate?: string;
 }
 
+export interface CategoryBucket {
+	label: string;
+	count: number;
+	price: number;
+}
+
 export interface RoomSummary {
 	roomId: number;
 	roomName: string;
@@ -231,6 +237,7 @@ export interface RoomSummary {
 	rusakRinganPrice: number;
 	rusakBeratCount: number;
 	rusakBeratPrice: number;
+	categories: CategoryBucket[];
 }
 
 // Table configuration for CRUD

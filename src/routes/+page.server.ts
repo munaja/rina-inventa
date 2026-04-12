@@ -42,6 +42,9 @@ export const load: PageServerLoad = async ({ url }) => {
 		const baik = byLabel('Baik');
 		const rusakRingan = byLabel('Rusak Ringan');
 		const rusakBerat = byLabel('Rusak Berat');
+		const categories = (stats.category ?? [])
+			.map((c) => ({ label: c.label, count: c.totalItem, price: c.totalValue }))
+			.sort((a, b) => b.count - a.count);
 
 		return {
 			roomId: r.roomId as number,
@@ -53,7 +56,8 @@ export const load: PageServerLoad = async ({ url }) => {
 			rusakRinganCount: rusakRingan?.totalItem ?? 0,
 			rusakRinganPrice: rusakRingan?.totalValue ?? 0,
 			rusakBeratCount: rusakBerat?.totalItem ?? 0,
-			rusakBeratPrice: rusakBerat?.totalValue ?? 0
+			rusakBeratPrice: rusakBerat?.totalValue ?? 0,
+			categories
 		};
 	});
 
