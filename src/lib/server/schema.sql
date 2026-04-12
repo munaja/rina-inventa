@@ -206,7 +206,8 @@ CREATE TABLE IF NOT EXISTS unit (
 -- Transaction tables
 CREATE TABLE IF NOT EXISTS inspection (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  date DATETIME NOT NULL
+  date DATE NOT NULL,
+  UNIQUE KEY uniq_inspection_date (date)
 );
 
 CREATE TABLE IF NOT EXISTS toolMachineInspection (
@@ -218,6 +219,7 @@ CREATE TABLE IF NOT EXISTS toolMachineInspection (
   bookDate VARCHAR(50) NULL,
   acquisitionDate VARCHAR(50) NULL,
   acquisitionValue VARCHAR(50) NULL,
+  currentValue VARCHAR(50) NULL,
   description VARCHAR(255) NULL,
   brandType VARCHAR(100) NULL,
   sizeCC VARCHAR(50) NULL,
@@ -233,6 +235,18 @@ CREATE TABLE IF NOT EXISTS toolMachineInspection (
   FOREIGN KEY (inspection_id) REFERENCES inspection(id) ON DELETE SET NULL,
   FOREIGN KEY (room_id) REFERENCES room(id) ON DELETE SET NULL,
   FOREIGN KEY (toolMachine_code) REFERENCES toolMachine(code) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS roomInspection (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  inspection_id INT UNSIGNED NOT NULL,
+  room_id INT UNSIGNED NOT NULL,
+  totalItem INT UNSIGNED NOT NULL DEFAULT 0,
+  totalValue BIGINT UNSIGNED NOT NULL DEFAULT 0,
+  stats JSON NULL,
+  UNIQUE KEY uniq_inspection_room (inspection_id, room_id),
+  FOREIGN KEY (inspection_id) REFERENCES inspection(id) ON DELETE CASCADE,
+  FOREIGN KEY (room_id) REFERENCES room(id) ON DELETE CASCADE
 );
 
 -- Seed admin user (password: admin123)

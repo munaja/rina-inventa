@@ -1,7 +1,8 @@
 import * as XLSX from 'xlsx';
 import pool from './db.js';
-import type { ResultSetHeader } from 'mysql2';
+import type { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import type { TableDef } from './table-config.js';
+import { parseValue } from './parse-value.js';
 
 export async function processExcelUpload(
 	buffer: Buffer,
@@ -95,7 +96,8 @@ export async function processExcelUpload(
 }
 
 export async function processToolMachineInspectionUpload(
-	buffer: Buffer
+	buffer: Buffer,
+	inspectionDate: string
 ): Promise<{ count: number }> {
 	const workbook = XLSX.read(buffer, { type: 'buffer' });
 
@@ -164,18 +166,19 @@ export async function processToolMachineInspectionUpload(
 		factoryNumber: 5,
 		sizeCC: 6,
 		material: 7,
-		acquisitionValue: 10,
+		currentValue: 10,
 		condition: 11,
 		remarks: 12
 	};
 
 	// Fields that are also present on the referenced `toolMachine` row. If the
 	// inspection value matches the master value, we store NULL and rely on the
-	// FK join at read time — avoiding duplicated data.
+	// FK join at read time — avoiding duplicated data. `currentValue` is
+	// intentionally absent: it is the inspection-time valuation and has no
+	// master counterpart.
 	const masterMirroredFields = [
 		'bookDate',
 		'acquisitionDate',
-		'acquisitionValue',
 		'description',
 		'brandType',
 		'sizeCC',
@@ -195,6 +198,15 @@ export async function processToolMachineInspectionUpload(
 	const conn = await pool.getConnection();
 	try {
 		await conn.beginTransaction();
+
+		// Upsert the inspection session row by date. The `LAST_INSERT_ID(id)`
+		// trick makes MySQL return the existing row's id on conflict, so a single
+		// round trip gives us "insert or reuse" without a separate SELECT.
+		const [inspResult] = await conn.execute<ResultSetHeader>(
+			'INSERT INTO inspection (date) VALUES (?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)',
+			[inspectionDate]
+		);
+		const inspectionId = inspResult.insertId;
 
 		// Verify the referenced building exists so the FK insert below will
 		// succeed, and produce a clearer error if it doesn't.
@@ -238,6 +250,13 @@ export async function processToolMachineInspectionUpload(
 			);
 			roomId = result.insertId;
 		}
+
+		// "Replace" semantics for re-uploads: any prior rows for this
+		// (inspection, room) pair are dropped before the new set is inserted.
+		await conn.execute(
+			'DELETE FROM toolMachineInspection WHERE inspection_id = ? AND room_id = ?',
+			[inspectionId, roomId]
+		);
 
 		for (let i = DATA_START_INDEX; i < rawData.length; i++) {
 			const row = rawData[i];
@@ -289,8 +308,8 @@ export async function processToolMachineInspectionUpload(
 				}
 			}
 
-			const cols: string[] = ['`toolMachine_code`', '`room_id`'];
-			const vals: (string | number | null)[] = [code, roomId];
+			const cols: string[] = ['`inspection_id`', '`toolMachine_code`', '`room_id`'];
+			const vals: (string | number | null)[] = [inspectionId, code, roomId];
 
 			for (const [field, val] of Object.entries(rowValues)) {
 				cols.push(`\`${field}\``);
@@ -305,6 +324,8 @@ export async function processToolMachineInspectionUpload(
 			count++;
 		}
 
+		await recomputeRoomInspection(conn, inspectionId, roomId);
+
 		await conn.commit();
 	} catch (e) {
 		await conn.rollback();
@@ -314,4 +335,53 @@ export async function processToolMachineInspectionUpload(
 	}
 
 	return { count };
+}
+
+type StatBucket = { label: string; totalItem: number; totalValue: number };
+
+async function recomputeRoomInspection(
+	conn: PoolConnection,
+	inspectionId: number,
+	roomId: number
+): Promise<void> {
+	const [rows] = await conn.execute<RowDataPacket[]>(
+		'SELECT currentValue, `condition`, description FROM toolMachineInspection WHERE inspection_id = ? AND room_id = ?',
+		[inspectionId, roomId]
+	);
+
+	let totalItem = 0;
+	let totalValue = 0;
+	const condMap = new Map<string, StatBucket>();
+	const catMap = new Map<string, StatBucket>();
+
+	const bump = (map: Map<string, StatBucket>, rawLabel: unknown, value: number) => {
+		const label = rawLabel != null && String(rawLabel).trim() !== '' ? String(rawLabel).trim() : '-';
+		const bucket = map.get(label) ?? { label, totalItem: 0, totalValue: 0 };
+		bucket.totalItem += 1;
+		bucket.totalValue += value;
+		map.set(label, bucket);
+	};
+
+	for (const row of rows) {
+		const value = parseValue(row.currentValue);
+		totalItem += 1;
+		totalValue += value;
+		bump(condMap, row.condition, value);
+		bump(catMap, row.description, value);
+	}
+
+	const stats = {
+		condition: [...condMap.values()],
+		category: [...catMap.values()]
+	};
+
+	await conn.execute(
+		`INSERT INTO roomInspection (inspection_id, room_id, totalItem, totalValue, stats)
+		 VALUES (?, ?, ?, ?, ?)
+		 ON DUPLICATE KEY UPDATE
+		   totalItem = VALUES(totalItem),
+		   totalValue = VALUES(totalValue),
+		   stats = VALUES(stats)`,
+		[inspectionId, roomId, totalItem, totalValue, JSON.stringify(stats)]
+	);
 }

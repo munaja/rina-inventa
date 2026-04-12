@@ -5,6 +5,7 @@
 	import * as Avatar from '$lib/components/shadcn-ui/avatar/index.js';
 	import type { User } from '$lib/types.js';
 	import { Wrench, Monitor, Building2, Landmark, Route, PackagePlus, PackageOpen, MapPin, ChevronDown, DoorOpen } from '@lucide/svelte';
+	import ScanMeDialog from './ScanMeDialog.svelte';
 
 	const inventarisItems = [
 		{ href: '/inventaris/tool-machine', label: 'Peralatan dan Mesin', icon: Wrench },
@@ -19,6 +20,8 @@
 	];
 
 	let { user }: { user: User | null } = $props();
+
+	let scanMeOpen = $state(false);
 
 	function isActive(path: string): boolean {
 		if (path === '/') return $page.url.pathname === '/';
@@ -45,6 +48,13 @@
 				>
 					Inspeksi
 				</a>
+				<button
+					type="button"
+					onclick={() => (scanMeOpen = true)}
+					class="rounded-md px-3 py-1.5 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+				>
+					Scan Me
+				</button>
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger>
 						{#snippet child({ props })}
@@ -123,3 +133,5 @@
 		</div>
 	</div>
 </nav>
+
+<ScanMeDialog bind:open={scanMeOpen} />

@@ -29,7 +29,9 @@
       "Bash(node:*)",
       "Bash(pnpm dev:*)",
       "Bash(curl:*)",
-      "Bash(npx svelte-check:*)"
+      "Bash(npx svelte-check:*)",
+      "Bash(pnpm exec:*)",
+      "Bash(pnpm install:*)"
     ]
   }
 }

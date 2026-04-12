@@ -111,6 +111,10 @@
 					<form method="POST" action="?/upload" enctype="multipart/form-data" use:enhance={() => { uploading = true; return async ({ update, result }) => { await update(); uploading = false; if (result.type === 'success') uploadDialogOpen = false; }; }} class="space-y-4">
 						<fieldset disabled={uploading} class="space-y-4">
 							<div class="space-y-2">
+								<Label for="upload-inspection-date">Tanggal Inspeksi</Label>
+								<Input id="upload-inspection-date" name="inspectionDate" type="date" required />
+							</div>
+							<div class="space-y-2">
 								<Label for="upload-file">File Excel (.xlsx)</Label>
 								<Input id="upload-file" name="file" type="file" accept=".xlsx,.xls" required />
 							</div>

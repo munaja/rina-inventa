@@ -144,14 +144,18 @@ export const actions: Actions = {
 	upload: async ({ request }) => {
 		const formData = await request.formData();
 		const file = formData.get('file') as File | null;
+		const inspectionDate = String(formData.get('inspectionDate') ?? '').trim();
 
 		if (!file || file.size === 0) {
 			return fail(400, { error: 'File wajib diupload' });
 		}
+		if (!/^\d{4}-\d{2}-\d{2}$/.test(inspectionDate)) {
+			return fail(400, { error: 'Tanggal inspeksi wajib diisi' });
+		}
 
 		try {
 			const buffer = Buffer.from(await file.arrayBuffer());
-			const result = await processToolMachineInspectionUpload(buffer);
+			const result = await processToolMachineInspectionUpload(buffer, inspectionDate);
 			return { uploaded: true, uploadCount: result.count };
 		} catch (e: unknown) {
 			return fail(400, { error: `Gagal mengupload: ${(e as Error).message}` });
