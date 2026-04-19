@@ -8,15 +8,15 @@
 	import ScanMeDialog from './ScanMeDialog.svelte';
 
 	const inventarisItems = [
-		{ href: '/inventaris/tool-machine', label: 'Peralatan dan Mesin', icon: Wrench },
-		{ href: '/inventaris/tool-software', label: 'Peralatan Lain', icon: Monitor },
-		{ href: '/room', label: 'Ruang', icon: DoorOpen },
-		{ href: '/inventaris/building', label: 'Gedung dan Bangunan', icon: Building2 },
-		{ href: '/inventaris/permanent-asset', label: 'Aset Tetap Lainnya', icon: Landmark },
-		{ href: '/inventaris/road', label: 'Jalan, Irigasi dan Jaringan', icon: Route },
-		{ href: '/inventaris/extra-asset', label: 'Aset Ekstrakompt', icon: PackagePlus },
-		{ href: '/inventaris/other-asset', label: 'Aset Lain-Lain', icon: PackageOpen },
-		{ href: '/inventaris/land', label: 'Tanah', icon: MapPin }
+		{ href: '/inventaris/peralatan-mesin', label: 'Peralatan dan Mesin', icon: Wrench },
+		{ href: '/inventaris/peralatan-lain', label: 'Peralatan Lain', icon: Monitor },
+		{ href: '/inventaris/ruang', label: 'Ruang', icon: DoorOpen },
+		{ href: '/inventaris/gedung-bangunan', label: 'Gedung dan Bangunan', icon: Building2 },
+		{ href: '/inventaris/aset-tetap-lainnya', label: 'Aset Tetap Lainnya', icon: Landmark },
+		{ href: '/inventaris/jalan-irigasi-jaringan', label: 'Jalan, Irigasi dan Jaringan', icon: Route },
+		{ href: '/inventaris/aset-ekstrakompt', label: 'Aset Ekstrakompt', icon: PackagePlus },
+		{ href: '/inventaris/aset-lain-lain', label: 'Aset Lain-Lain', icon: PackageOpen },
+		{ href: '/inventaris/tanah', label: 'Tanah', icon: MapPin }
 	];
 
 	let { user }: { user: User | null } = $props();
@@ -41,8 +41,8 @@
 			{#if !isActive('/admin')}
 			<div class="hidden items-center gap-1 sm:flex">
 				<a
-					href="/inspection"
-					class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors {isActive('/inspection')
+					href="/inspeksi"
+					class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors {isActive('/inspeksi')
 						? 'bg-white/20 text-white'
 						: 'text-white/70 hover:bg-white/10 hover:text-white'}"
 				>

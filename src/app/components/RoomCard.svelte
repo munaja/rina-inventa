@@ -78,7 +78,7 @@
 	];
 
 	const baseUrl = $derived(
-		`/inspection?room-id=${summary.roomId}&inspection-date=${inspectionDate}`
+		`/inspeksi?room-id=${summary.roomId}&inspection-date=${inspectionDate}`
 	);
 
 	type Segment = {

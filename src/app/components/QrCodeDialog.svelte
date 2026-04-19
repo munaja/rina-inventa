@@ -6,7 +6,7 @@
 		open = $bindable(false),
 		roomId,
 		roomName,
-		path = '/inspection'
+		path = '/inspeksi'
 	}: { open: boolean; roomId: number; roomName: string; path?: string } = $props();
 
 	const qrUrl = $derived(`${$page.url.origin}${path}?room_id=${roomId}`);

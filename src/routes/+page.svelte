@@ -57,25 +57,25 @@
 				<h2 class="text-lg font-semibold">Keseluruhan</h2>
 			</div>
 			<div class="grid grid-cols-1 gap-3 font-heading md:grid-cols-2 lg:grid-cols-4 mb-10">
-				<a href="/inspection?inspection-date={data.selectedDate}" class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-800 p-5 shadow-lg shadow-primary/25 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/30">
+				<a href="/inspeksi?inspection-date={data.selectedDate}" class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-800 p-5 shadow-lg shadow-primary/25 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/30">
 					<Archive class="absolute top-3 right-3 h-16 w-16 text-white/20 transition-all duration-300 group-hover:scale-110 group-hover:text-white/35" />
 					<p class="text-sm font-medium uppercase tracking-wider text-primary-foreground/70 transition-colors duration-300 group-hover:text-white">Semua Item</p>
 					<p class="mt-2 text-4xl font-bold text-primary-foreground">{totalItems.toLocaleString('id-ID')}</p>
 					<p class="mt-1 text-base font-semibold text-primary-foreground/70">{formatRupiah(totalPrice)}</p>
 				</a>
-				<a href="/inspection?kondisi=Baik&inspection-date={data.selectedDate}" class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-700 p-5 shadow-lg shadow-emerald-600/25 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-600/30">
+				<a href="/inspeksi?kondisi=Baik&inspection-date={data.selectedDate}" class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-700 p-5 shadow-lg shadow-emerald-600/25 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-600/30">
 					<CircleCheck class="absolute top-3 right-3 h-16 w-16 text-white/20 transition-all duration-300 group-hover:scale-110 group-hover:text-white/35" />
 					<p class="text-sm font-medium uppercase tracking-wider text-white/70 transition-colors duration-300 group-hover:text-white">Baik</p>
 					<p class="mt-2 text-4xl font-bold text-white">{totalBaik.toLocaleString('id-ID')}</p>
 					<p class="mt-1 text-base font-semibold text-white/70">{formatRupiah(totalBaikPrice)}</p>
 				</a>
-				<a href="/inspection?kondisi=Rusak Ringan&inspection-date={data.selectedDate}" class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-amber-400 to-amber-700 p-5 shadow-lg shadow-amber-500/25 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-500/30">
+				<a href="/inspeksi?kondisi=Rusak Ringan&inspection-date={data.selectedDate}" class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-amber-400 to-amber-700 p-5 shadow-lg shadow-amber-500/25 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-500/30">
 					<AlertTriangle class="absolute top-3 right-3 h-16 w-16 text-white/20 transition-all duration-300 group-hover:scale-110 group-hover:text-white/35" />
 					<p class="text-sm font-medium uppercase tracking-wider text-white/70 transition-colors duration-300 group-hover:text-white">Rusak Ringan</p>
 					<p class="mt-2 text-4xl font-bold text-white">{totalRusakRingan.toLocaleString('id-ID')}</p>
 					<p class="mt-1 text-base font-semibold text-white/70">{formatRupiah(totalRusakRinganPrice)}</p>
 				</a>
-				<a href="/inspection?kondisi=Rusak Berat&inspection-date={data.selectedDate}" class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-red-500 to-red-800 p-5 shadow-lg shadow-red-600/25 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-red-600/30">
+				<a href="/inspeksi?kondisi=Rusak Berat&inspection-date={data.selectedDate}" class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-red-500 to-red-800 p-5 shadow-lg shadow-red-600/25 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-red-600/30">
 					<CircleX class="absolute top-3 right-3 h-16 w-16 text-white/20 transition-all duration-300 group-hover:scale-110 group-hover:text-white/35" />
 					<p class="text-sm font-medium uppercase tracking-wider text-white/70 transition-colors duration-300 group-hover:text-white">Rusak Berat</p>
 					<p class="mt-2 text-4xl font-bold text-white">{totalRusakBerat.toLocaleString('id-ID')}</p>

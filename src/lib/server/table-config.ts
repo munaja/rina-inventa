@@ -170,7 +170,7 @@ export const TABLE_DEFS: Record<string, TableDef> = {
 	}
 };
 
-// Map from URL slug (kebab-case) to table key (camelCase)
+// Map from admin URL slug (kebab-case, English) to table key (camelCase)
 export const SLUG_TO_TABLE: Record<string, string> = {
 	'land': 'land',
 	'tool-machine': 'toolMachine',
@@ -181,6 +181,19 @@ export const SLUG_TO_TABLE: Record<string, string> = {
 	'construction': 'construction',
 	'other-asset': 'otherAsset',
 	'extra-asset': 'extraAsset'
+};
+
+// Map from public /inventaris URL slug (Bahasa) to table key (camelCase)
+export const PUBLIC_SLUG_TO_TABLE: Record<string, string> = {
+	'tanah': 'land',
+	'peralatan-mesin': 'toolMachine',
+	'peralatan-lain': 'toolSoftware',
+	'gedung-bangunan': 'building',
+	'jalan-irigasi-jaringan': 'road',
+	'aset-tetap-lainnya': 'permanentAsset',
+	'konstruksi': 'construction',
+	'aset-lain-lain': 'otherAsset',
+	'aset-ekstrakompt': 'extraAsset'
 };
 
 // Map from URL slug to Excel file name

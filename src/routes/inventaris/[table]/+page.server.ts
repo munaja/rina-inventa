@@ -1,24 +1,24 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { TABLE_DEFS, SLUG_TO_TABLE } from '$lib/server/table-config.js';
+import { TABLE_DEFS, PUBLIC_SLUG_TO_TABLE } from '$lib/server/table-config.js';
 import { loadTableData } from '$lib/server/crud.js';
 
 // Only expose "source" tables publicly
 const SOURCE_SLUGS = new Set([
-	'tool-machine',
-	'tool-software',
-	'building',
-	'permanent-asset',
-	'road',
-	'extra-asset',
-	'other-asset',
-	'land'
+	'peralatan-mesin',
+	'peralatan-lain',
+	'gedung-bangunan',
+	'aset-tetap-lainnya',
+	'jalan-irigasi-jaringan',
+	'aset-ekstrakompt',
+	'aset-lain-lain',
+	'tanah'
 ]);
 
 export const load: PageServerLoad = async ({ params, url }) => {
 	if (!SOURCE_SLUGS.has(params.table)) throw error(404, 'Not found');
 
-	const tableKey = SLUG_TO_TABLE[params.table];
+	const tableKey = PUBLIC_SLUG_TO_TABLE[params.table];
 	if (!tableKey) throw error(404, 'Not found');
 
 	const tableDef = TABLE_DEFS[tableKey];

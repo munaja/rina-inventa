@@ -55,7 +55,7 @@
 		for (const [k, v] of Object.entries(filters)) {
 			if (v) params.set(k, String(v));
 		}
-		return `/inspection?${params.toString()}`;
+		return `/inspeksi?${params.toString()}`;
 	}
 
 	function conditionBadgeClass(condition: string | null) {
@@ -129,7 +129,7 @@
 			</div>
 			<div class="flex gap-2">
 				<Button type="submit" size="default">Filter</Button>
-				<Button variant="ghost" size="default" href="/inspection">Reset</Button>
+				<Button variant="ghost" size="default" href="/inspeksi">Reset</Button>
 			</div>
 		</div>
 	</form>

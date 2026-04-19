@@ -11,14 +11,14 @@
 	import { isNumericColumn, isCodeColumn, formatIDNumber } from '$lib/format.js';
 
 	const tableIcons: Record<string, typeof Wrench> = {
-		'tool-machine': Wrench,
-		'tool-software': Monitor,
-		'building': Building2,
-		'permanent-asset': Landmark,
-		'road': Route,
-		'extra-asset': PackagePlus,
-		'other-asset': PackageOpen,
-		'land': MapPin
+		'peralatan-mesin': Wrench,
+		'peralatan-lain': Monitor,
+		'gedung-bangunan': Building2,
+		'aset-tetap-lainnya': Landmark,
+		'jalan-irigasi-jaringan': Route,
+		'aset-ekstrakompt': PackagePlus,
+		'aset-lain-lain': PackageOpen,
+		'tanah': MapPin
 	};
 
 	let { data } = $props();

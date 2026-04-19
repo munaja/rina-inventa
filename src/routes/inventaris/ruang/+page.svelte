@@ -6,9 +6,9 @@
 	import { Input } from '$lib/components/shadcn-ui/input/index.js';
 	import { Search, X, ChevronLeft, ChevronRight, DoorOpen, QrCode } from '@lucide/svelte';
 	import { isNumericColumn } from '$lib/format.js';
-	import CodeTooltip from '../../app/components/CodeTooltip.svelte';
-	import DetailDialog from '../../app/components/DetailDialog.svelte';
-	import QrCodeDialog from '../../app/components/QrCodeDialog.svelte';
+	import CodeTooltip from '../../../app/components/CodeTooltip.svelte';
+	import DetailDialog from '../../../app/components/DetailDialog.svelte';
+	import QrCodeDialog from '../../../app/components/QrCodeDialog.svelte';
 
 	let { data } = $props();
 	const spaceIsNumeric = $derived(isNumericColumn(data.items, 'space'));
