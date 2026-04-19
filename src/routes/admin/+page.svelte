@@ -37,7 +37,7 @@
 	{#each cards as card}
 		<a
 			href={card.href}
-			class="group relative flex flex-col justify-between gap-6 overflow-hidden rounded-xl border bg-gradient-to-br from-card via-card to-muted/40 p-5 shadow-sm ring-1 ring-foreground/5 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg hover:ring-foreground/10"
+			class="group relative flex flex-col justify-between gap-6 overflow-hidden rounded-xl border bg-gradient-to-br from-card via-card to-muted/40 p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg"
 		>
 			<div
 				class="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gradient-to-br from-foreground/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"

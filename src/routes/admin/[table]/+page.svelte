@@ -108,7 +108,7 @@
 				<Input
 					placeholder="Cari..."
 					bind:value={searchValue}
-					class="pr-16"
+					class="bg-white pr-16"
 				/>
 				{#if searchValue}
 					<button type="button" onclick={() => { searchValue = ''; goto(buildUrl({ search: '', page: '' })); }} class="absolute right-9 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">

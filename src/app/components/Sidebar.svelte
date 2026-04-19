@@ -15,7 +15,8 @@
 		MapPin,
 		DoorOpen,
 		Users,
-		Home
+		Home,
+		LayoutDashboard
 	} from '@lucide/svelte';
 
 	let { user }: { user: User } = $props();
@@ -55,12 +56,17 @@
 		}
 	];
 
+	const topItems: MenuItem[] = [
+		{ href: '/admin', label: 'Dashboard', icon: LayoutDashboard }
+	];
+
 	const bottomItems: MenuItem[] = [
 		{ href: '/admin/users', label: 'Pengguna', icon: Users, adminOnly: true }
 	];
 
-	function isActive(href: string): boolean {
+	function isActive(href: string, exact = false): boolean {
 		const path = $page.url.pathname;
+		if (exact) return path === href;
 		return path === href || path.startsWith(href + '/');
 	}
 </script>
@@ -82,10 +88,20 @@
 
 		<!-- Navigation -->
 		<nav class="flex-1 overflow-y-auto px-3 py-4">
-			{#each menuGroups as group, i}
-				{#if i > 0}
-					<Separator class="my-3" />
-				{/if}
+			{#each topItems as item}
+				<a
+					href={item.href}
+					class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all {isActive(item.href, true)
+						? 'bg-primary text-primary-foreground shadow-sm'
+						: 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'}"
+				>
+					<item.icon class="h-4 w-4" />
+					{item.label}
+				</a>
+			{/each}
+
+			{#each menuGroups as group}
+				<Separator class="my-3" />
 				<p class="mb-2 px-3 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
 					{group.label}
 				</p>
