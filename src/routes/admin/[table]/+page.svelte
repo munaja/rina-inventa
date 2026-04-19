@@ -11,7 +11,9 @@
 	import { Plus, Upload, Search, X, ChevronLeft, ChevronRight, Pencil, Wrench, Monitor, Building2, Landmark, Route, PackagePlus, PackageOpen, MapPin } from '@lucide/svelte';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import DeleteDialog from '../../../app/components/DeleteDialog.svelte';
-	import { isNumericColumn } from '$lib/format.js';
+	import CodeTooltip from '../../../app/components/CodeTooltip.svelte';
+	import DetailDialog from '../../../app/components/DetailDialog.svelte';
+	import { isNumericColumn, isCodeColumn } from '$lib/format.js';
 
 	const tableIcons: Record<string, typeof Wrench> = {
 		'tool-machine': Wrench,
@@ -32,6 +34,8 @@
 	let uploadDialogOpen = $state(false);
 	let uploading = $state(false);
 	let editItem = $state<Record<string, unknown>>({});
+	let detailDialogOpen = $state(false);
+	let detailItem = $state<Record<string, unknown> | null>(null);
 
 	const tableCols = $derived(data.tableDef.columns.filter((c: { showInTable?: boolean }) => c.showInTable !== false));
 	const allCols = $derived(data.tableDef.columns);
@@ -59,6 +63,11 @@
 	function openEdit(item: Record<string, unknown>) {
 		editItem = { ...item };
 		editDialogOpen = true;
+	}
+
+	function openDetail(item: Record<string, unknown>) {
+		detailItem = item;
+		detailDialogOpen = true;
 	}
 
 	let searchValue = $state(data.search || '');
@@ -257,14 +266,22 @@
 				</Table.Header>
 				<Table.Body>
 					{#each data.items as item, i}
-						<Table.Row>
+						<Table.Row class="cursor-pointer" onclick={() => openDetail(item)}>
 							<Table.Cell class="text-center text-muted-foreground">{(data.page - 1) * data.pageSize + i + 1}</Table.Cell>
 							{#each tableCols as col}
-								<Table.Cell class="max-w-[200px] truncate {colAlign(col)}">
-									{item[col.key] ?? '-'}
+								<Table.Cell class="max-w-[200px] {colAlign(col)}">
+									{#if isCodeColumn(col.key)}
+										<div class="min-w-[300px] max-w-[380px]">
+											<CodeTooltip value={item[col.key] as string | number | null | undefined} />
+										</div>
+									{:else if col.key === 'description'}
+										<div class="whitespace-normal">{item[col.key] ?? '-'}</div>
+									{:else}
+										<div class="truncate">{item[col.key] ?? '-'}</div>
+									{/if}
 								</Table.Cell>
 							{/each}
-							<Table.Cell>
+							<Table.Cell onclick={(e: MouseEvent) => e.stopPropagation()}>
 								<div class="flex justify-center gap-1">
 									<Button variant="ghost" size="icon" onclick={() => openEdit(item)}>
 										<Pencil class="h-4 w-4" />
@@ -312,6 +329,9 @@
 			</div>
 		{/if}
 	</div>
+
+	<!-- Detail Dialog -->
+	<DetailDialog bind:open={detailDialogOpen} title="Detail {data.tableDef.label}" columns={allCols} item={detailItem} />
 
 	<!-- Edit Dialog -->
 	<Dialog.Root bind:open={editDialogOpen}>

@@ -33,3 +33,8 @@ export function isNumericColumn(items: Record<string, unknown>[], key: string): 
 	}
 	return seen;
 }
+
+/** True if a column key represents a code column (primary, FK, or variants). */
+export function isCodeColumn(key: string): boolean {
+	return key === 'code' || key === 'codeL' || key === 'refCode' || key.endsWith('_code');
+}

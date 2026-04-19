@@ -11,7 +11,17 @@
 	import { Plus, Search, X, ChevronLeft, ChevronRight, Pencil, QrCode, DoorOpen } from '@lucide/svelte';
 	import QrCodeDialog from '../../../app/components/QrCodeDialog.svelte';
 	import DeleteDialog from '../../../app/components/DeleteDialog.svelte';
+	import CodeTooltip from '../../../app/components/CodeTooltip.svelte';
+	import DetailDialog from '../../../app/components/DetailDialog.svelte';
 	import { isNumericColumn } from '$lib/format.js';
+
+	const roomDetailCols = [
+		{ key: 'code', label: 'Kode' },
+		{ key: 'name', label: 'Nama' },
+		{ key: 'space', label: 'Luas' },
+		{ key: 'buildingName', label: 'Gedung' },
+		{ key: 'building_code', label: 'Kode Gedung' }
+	];
 
 	let { data, form } = $props();
 	const spaceIsNumeric = $derived(isNumericColumn(data.items, 'space'));
@@ -24,6 +34,12 @@
 	let qrRoomName = $state('');
 	let searchValue = $state(data.search || '');
 	let jumpValue = $state('');
+	let detailDialogOpen = $state(false);
+	let detailItem = $state<Record<string, unknown> | null>(null);
+	function openDetail(item: Record<string, unknown>) {
+		detailItem = item;
+		detailDialogOpen = true;
+	}
 
 	const pageButtons = $derived.by(() => {
 		const total = data.totalPages;
@@ -166,18 +182,22 @@
 			</Table.Header>
 			<Table.Body>
 				{#each data.items as item, i}
-					<Table.Row>
+					<Table.Row class="cursor-pointer" onclick={() => openDetail(item)}>
 						<Table.Cell class="text-center text-muted-foreground">{(data.page - 1) * data.pageSize + i + 1}</Table.Cell>
-						<Table.Cell>{item.code ?? '-'}</Table.Cell>
+						<Table.Cell>
+							<div class="min-w-[300px] max-w-[380px]">
+								<CodeTooltip value={item.code as string | null | undefined} />
+							</div>
+						</Table.Cell>
 						<Table.Cell class="font-medium">{item.name}</Table.Cell>
 						<Table.Cell class={spaceIsNumeric ? 'text-right' : ''}>{item.space ?? '-'}</Table.Cell>
 						<Table.Cell>{item.buildingName ?? '-'}</Table.Cell>
-						<Table.Cell>
+						<Table.Cell onclick={(e: MouseEvent) => e.stopPropagation()}>
 							<Button variant="ghost" size="icon" onclick={() => showQr(Number(item.id), String(item.name))}>
 								<QrCode class="h-4 w-4" />
 							</Button>
 						</Table.Cell>
-						<Table.Cell>
+						<Table.Cell onclick={(e: MouseEvent) => e.stopPropagation()}>
 							<div class="flex justify-center gap-1">
 								<Button variant="ghost" size="icon" onclick={() => { editItem = { ...item }; editDialogOpen = true; }}>
 									<Pencil class="h-4 w-4" />
@@ -196,6 +216,8 @@
 			</Table.Body>
 		</Table.Root>
 	</div>
+
+	<DetailDialog bind:open={detailDialogOpen} title="Detail Ruangan" columns={roomDetailCols} item={detailItem} />
 
 	<div class="mt-4 flex items-center justify-between">
 		<p class="text-sm text-muted-foreground">

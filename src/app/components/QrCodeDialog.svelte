@@ -2,21 +2,25 @@
 	import * as Dialog from '$lib/components/shadcn-ui/dialog/index.js';
 	import { page } from '$app/stores';
 
-	let { open = $bindable(false), roomId, roomName }: { open: boolean; roomId: number; roomName: string } = $props();
+	let {
+		open = $bindable(false),
+		roomId,
+		roomName,
+		path = '/inspection'
+	}: { open: boolean; roomId: number; roomName: string; path?: string } = $props();
 
+	const qrUrl = $derived(`${$page.url.origin}${path}?room_id=${roomId}`);
 	let qrDataUrl = $state('');
 
-	async function generateQr(id: number) {
-		if (!id) return;
-		const origin = $page.url.origin;
-		const url = `${origin}/inspection?room_id=${id}`;
+	async function generateQr(url: string) {
+		if (!roomId) return;
 		const QRCode = await import('qrcode');
 		qrDataUrl = await QRCode.toDataURL(url, { width: 300, margin: 2 });
 	}
 
 	$effect(() => {
 		if (open && roomId) {
-			generateQr(roomId);
+			generateQr(qrUrl);
 		}
 	});
 </script>
@@ -30,9 +34,14 @@
 		<div class="flex flex-col items-center gap-4 py-4">
 			{#if qrDataUrl}
 				<img src={qrDataUrl} alt="QR Code for {roomName}" class="rounded-lg border" />
-				<p class="text-center text-xs text-muted-foreground break-all">
-					{$page.url.origin}/inspection?room_id={roomId}
-				</p>
+				<a
+					href={qrUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="text-center text-xs text-muted-foreground break-all underline hover:text-foreground"
+				>
+					{qrUrl}
+				</a>
 			{:else}
 				<p class="text-sm text-muted-foreground">Generating QR code...</p>
 			{/if}

@@ -30,7 +30,7 @@
 </script>
 
 <nav class="sticky top-0 z-50 border-b bg-gradient-to-r from-sky-500 to-sky-700 shadow-md">
-	<div class="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8 {isActive('/admin') ? '' : 'mx-auto max-w-7xl'}">
+	<div class="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8 {isActive('/admin') ? '' : 'mx-auto max-w-[1400px]'}">
 		<div class="flex items-center gap-8">
 			<a href="/" class="flex items-center gap-2.5">
 				<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/20 text-xs font-bold text-white">

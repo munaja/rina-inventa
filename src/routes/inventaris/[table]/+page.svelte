@@ -5,8 +5,10 @@
 	import * as Table from '$lib/components/shadcn-ui/table/index.js';
 	import { Input } from '$lib/components/shadcn-ui/input/index.js';
 	import { Search, X, ChevronLeft, ChevronRight, Wrench, Monitor, Building2, Landmark, Route, PackagePlus, PackageOpen, MapPin } from '@lucide/svelte';
+	import CodeTooltip from '../../../app/components/CodeTooltip.svelte';
+	import DetailDialog from '../../../app/components/DetailDialog.svelte';
 
-	import { isNumericColumn } from '$lib/format.js';
+	import { isNumericColumn, isCodeColumn } from '$lib/format.js';
 
 	const tableIcons: Record<string, typeof Wrench> = {
 		'tool-machine': Wrench,
@@ -23,7 +25,15 @@
 	const TableIcon = $derived(tableIcons[data.slug]);
 
 	const tableCols = $derived(data.tableDef.columns.filter((c: { showInTable?: boolean }) => c.showInTable !== false));
+	const allCols = $derived(data.tableDef.columns);
 	const numericKeys = $derived(new Set(tableCols.filter((c: { key: string }) => isNumericColumn(data.items, c.key)).map((c: { key: string }) => c.key)));
+
+	let detailDialogOpen = $state(false);
+	let detailItem = $state<Record<string, unknown> | null>(null);
+	function openDetail(item: Record<string, unknown>) {
+		detailItem = item;
+		detailDialogOpen = true;
+	}
 
 	const CENTERED_LABELS = new Set(['Status', 'Condition', 'Quantity']);
 	function colAlign(col: { key: string; label: string }): string {
@@ -68,7 +78,7 @@
 	}
 </script>
 
-<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+<div class="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
 	<!-- Header -->
 	<div class="mb-6 flex items-center justify-between gap-4">
 		<div class="shrink-0">
@@ -105,11 +115,19 @@
 				</Table.Header>
 				<Table.Body>
 					{#each data.items as item, i}
-						<Table.Row>
+						<Table.Row class="cursor-pointer" onclick={() => openDetail(item)}>
 							<Table.Cell class="text-center text-muted-foreground">{(data.page - 1) * data.pageSize + i + 1}</Table.Cell>
 							{#each tableCols as col}
-								<Table.Cell class="max-w-[200px] truncate {colAlign(col)}">
-									{item[col.key] ?? '-'}
+								<Table.Cell class="max-w-[200px] {colAlign(col)}">
+									{#if isCodeColumn(col.key)}
+										<div class="min-w-[300px] max-w-[380px]">
+											<CodeTooltip value={item[col.key] as string | number | null | undefined} />
+										</div>
+									{:else if col.key === 'description'}
+										<div class="whitespace-normal">{item[col.key] ?? '-'}</div>
+									{:else}
+										<div class="truncate">{item[col.key] ?? '-'}</div>
+									{/if}
 								</Table.Cell>
 							{/each}
 						</Table.Row>
@@ -124,6 +142,8 @@
 			</Table.Root>
 		</div>
 	</div>
+
+	<DetailDialog bind:open={detailDialogOpen} title="Detail {data.tableDef.label}" columns={allCols} item={detailItem} />
 
 	<!-- Pagination -->
 	<div class="mt-4 flex items-center justify-between">

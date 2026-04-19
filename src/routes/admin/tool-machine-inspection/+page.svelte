@@ -13,6 +13,8 @@
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import ImageDialog from '../../../app/components/ImageDialog.svelte';
 	import DeleteDialog from '../../../app/components/DeleteDialog.svelte';
+	import CodeTooltip from '../../../app/components/CodeTooltip.svelte';
+	import DetailDialog from '../../../app/components/DetailDialog.svelte';
 
 	let { data, form } = $props();
 
@@ -24,6 +26,29 @@
 	let editItem = $state<Record<string, unknown>>({});
 	let imageItem = $state<{ id: number; imgUrl: string | null }>({ id: 0, imgUrl: null });
 	let searchValue = $state(data.search || '');
+	let detailDialogOpen = $state(false);
+	let detailItem = $state<Record<string, unknown> | null>(null);
+	const inspectionDetailCols = [
+		{ key: 'toolMachine_code', label: 'Code' },
+		{ key: 'toolMachineName', label: 'Name' },
+		{ key: 'description', label: 'Description' },
+		{ key: 'brandType', label: 'Brand/Type' },
+		{ key: 'sizeCC', label: 'Ukuran' },
+		{ key: 'material', label: 'Bahan' },
+		{ key: 'factoryNumber', label: 'No. Seri Pabrik' },
+		{ key: 'acquisitionDate', label: 'Tgl Perolehan' },
+		{ key: 'acquisitionValue', label: 'Nilai Perolehan' },
+		{ key: 'currentValue', label: 'Nilai Saat Ini' },
+		{ key: 'roomName', label: 'Ruangan' },
+		{ key: 'roomSpace', label: 'Luas Ruangan' },
+		{ key: 'inspectionDate', label: 'Tanggal Inspeksi' },
+		{ key: 'condition', label: 'Kondisi' },
+		{ key: 'remarks', label: 'Keterangan' }
+	];
+	function openDetail(item: Record<string, unknown>) {
+		detailItem = item;
+		detailDialogOpen = true;
+	}
 
 	function buildUrl(params: Record<string, string | number>) {
 		const url = new URL($page.url);
@@ -216,11 +241,15 @@
 				</Table.Header>
 				<Table.Body>
 					{#each data.items as item, i}
-						<Table.Row>
+						<Table.Row class="cursor-pointer" onclick={() => openDetail(item)}>
 							<Table.Cell class="text-center text-muted-foreground">{(data.page - 1) * data.pageSize + i + 1}</Table.Cell>
-							<Table.Cell class="max-w-[120px] truncate">{item.toolMachine_code ?? '-'}</Table.Cell>
+							<Table.Cell>
+								<div class="min-w-[300px] max-w-[380px]">
+									<CodeTooltip value={item.toolMachine_code as string | null | undefined} />
+								</div>
+							</Table.Cell>
 							<Table.Cell class="max-w-[200px] truncate">{item.toolMachineName ?? '-'}</Table.Cell>
-							<Table.Cell class="max-w-[200px] truncate">{item.description ?? '-'}</Table.Cell>
+							<Table.Cell class="truncate whitespace-normal">{item.description ?? '-'}</Table.Cell>
 							<Table.Cell class="max-w-[120px] truncate">{item.brandType ?? '-'}</Table.Cell>
 							<Table.Cell>{item.roomName ?? '-'}</Table.Cell>
 							<Table.Cell class="text-center">
@@ -230,12 +259,12 @@
 									-
 								{/if}
 							</Table.Cell>
-							<Table.Cell>
+							<Table.Cell onclick={(e: MouseEvent) => e.stopPropagation()}>
 								<Button variant="ghost" size="icon" onclick={() => { imageItem = { id: Number(item.id), imgUrl: item.imgUrl ? String(item.imgUrl) : null }; imageDialogOpen = true; }}>
 									<Image class="h-4 w-4" />
 								</Button>
 							</Table.Cell>
-							<Table.Cell>
+							<Table.Cell onclick={(e: MouseEvent) => e.stopPropagation()}>
 								<div class="flex justify-center gap-1">
 									<Button variant="ghost" size="icon" onclick={() => { editItem = { ...item }; editDialogOpen = true; }}>
 										<Pencil class="h-4 w-4" />
@@ -253,6 +282,8 @@
 			</Table.Root>
 		</div>
 	</div>
+
+	<DetailDialog bind:open={detailDialogOpen} title="Detail Inspeksi" columns={inspectionDetailCols} item={detailItem} />
 
 	{#if data.totalPages > 1}
 		<div class="mt-4 flex items-center justify-between">

@@ -18,7 +18,7 @@
 <!-- Hero section -->
 <div class="relative overflow-hidden border-b bg-gradient-to-br from-primary/5 via-background to-primary/3">
 	<div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(120,119,198,0.12),transparent)]"></div>
-	<div class="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+	<div class="relative mx-auto max-w-[1400px] px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
 		<div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
 			<div>
 				<h1 class="text-3xl font-bold tracking-tight sm:text-4xl">Dashboard Inventaris</h1>
@@ -81,7 +81,7 @@
 </div>
 
 <!-- Room cards -->
-<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+<div class="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
 	{#if data.summaries.length === 0}
 		<div class="flex flex-col items-center justify-center rounded-xl border-2 border-dashed py-20">
 			<Archive class="h-12 w-12 text-muted-foreground/40" />

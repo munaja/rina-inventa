@@ -4,14 +4,38 @@
 	import { Button } from '$lib/components/shadcn-ui/button/index.js';
 	import * as Table from '$lib/components/shadcn-ui/table/index.js';
 	import { Input } from '$lib/components/shadcn-ui/input/index.js';
-	import { Search, X, ChevronLeft, ChevronRight, DoorOpen } from '@lucide/svelte';
+	import { Search, X, ChevronLeft, ChevronRight, DoorOpen, QrCode } from '@lucide/svelte';
 	import { isNumericColumn } from '$lib/format.js';
+	import CodeTooltip from '../../app/components/CodeTooltip.svelte';
+	import DetailDialog from '../../app/components/DetailDialog.svelte';
+	import QrCodeDialog from '../../app/components/QrCodeDialog.svelte';
 
 	let { data } = $props();
 	const spaceIsNumeric = $derived(isNumericColumn(data.items, 'space'));
 
 	let searchValue = $state(data.search || '');
 	let jumpValue = $state('');
+	let detailDialogOpen = $state(false);
+	let detailItem = $state<Record<string, unknown> | null>(null);
+	let qrDialogOpen = $state(false);
+	let qrRoomId = $state(0);
+	let qrRoomName = $state('');
+	function showQr(id: number, name: string) {
+		qrRoomId = id;
+		qrRoomName = name;
+		qrDialogOpen = true;
+	}
+	const roomDetailCols = [
+		{ key: 'code', label: 'Kode' },
+		{ key: 'name', label: 'Nama' },
+		{ key: 'space', label: 'Luas' },
+		{ key: 'buildingName', label: 'Gedung' },
+		{ key: 'building_code', label: 'Kode Gedung' }
+	];
+	function openDetail(item: Record<string, unknown>) {
+		detailItem = item;
+		detailDialogOpen = true;
+	}
 
 	const pageButtons = $derived.by(() => {
 		const total = data.totalPages;
@@ -46,7 +70,7 @@
 	}
 </script>
 
-<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+<div class="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
 	<div class="mb-6 flex items-center justify-between gap-4">
 		<div class="shrink-0">
 			<h1 class="flex items-center gap-2 text-2xl font-bold tracking-tight"><DoorOpen class="h-6 w-6" /> Ruangan</h1>
@@ -77,20 +101,30 @@
 					<Table.Head class="font-semibold">Nama</Table.Head>
 					<Table.Head class="font-semibold {spaceIsNumeric ? 'text-right' : ''}">Luas</Table.Head>
 					<Table.Head class="font-semibold">Gedung</Table.Head>
+					<Table.Head class="text-center font-semibold">QR Code</Table.Head>
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
 				{#each data.items as item, i}
-					<Table.Row>
+					<Table.Row class="cursor-pointer" onclick={() => openDetail(item)}>
 						<Table.Cell class="text-center text-muted-foreground">{(data.page - 1) * data.pageSize + i + 1}</Table.Cell>
-						<Table.Cell>{item.code ?? '-'}</Table.Cell>
+						<Table.Cell>
+							<div class="min-w-[300px] max-w-[380px]">
+								<CodeTooltip value={item.code as string | null | undefined} />
+							</div>
+						</Table.Cell>
 						<Table.Cell class="font-medium">{item.name}</Table.Cell>
 						<Table.Cell class={spaceIsNumeric ? 'text-right' : ''}>{item.space ?? '-'}</Table.Cell>
 						<Table.Cell>{item.buildingName ?? '-'}</Table.Cell>
+						<Table.Cell class="text-center" onclick={(e: MouseEvent) => e.stopPropagation()}>
+							<Button variant="ghost" size="icon" onclick={() => showQr(Number(item.id), String(item.name))}>
+								<QrCode class="h-4 w-4" />
+							</Button>
+						</Table.Cell>
 					</Table.Row>
 				{:else}
 					<Table.Row>
-						<Table.Cell colspan={5} class="py-12 text-center text-muted-foreground">
+						<Table.Cell colspan={6} class="py-12 text-center text-muted-foreground">
 							Belum ada ruangan.
 						</Table.Cell>
 					</Table.Row>
@@ -98,6 +132,9 @@
 			</Table.Body>
 		</Table.Root>
 	</div>
+
+	<DetailDialog bind:open={detailDialogOpen} title="Detail Ruangan" columns={roomDetailCols} item={detailItem} />
+	<QrCodeDialog bind:open={qrDialogOpen} roomId={qrRoomId} roomName={qrRoomName} />
 
 	<div class="mt-4 flex items-center justify-between">
 		<p class="text-sm text-muted-foreground">

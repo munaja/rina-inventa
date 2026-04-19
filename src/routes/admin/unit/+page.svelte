@@ -8,11 +8,23 @@
 	import { Label } from '$lib/components/shadcn-ui/label/index.js';
 	import { Plus, Pencil, Building } from '@lucide/svelte';
 	import DeleteDialog from '../../../app/components/DeleteDialog.svelte';
+	import CodeTooltip from '../../../app/components/CodeTooltip.svelte';
+	import DetailDialog from '../../../app/components/DetailDialog.svelte';
 
 	let { data, form } = $props();
 	let createDialogOpen = $state(false);
 	let editDialogOpen = $state(false);
 	let editItem = $state({ id: 0, code: '', name: '' });
+	let detailDialogOpen = $state(false);
+	let detailItem = $state<Record<string, unknown> | null>(null);
+	const unitDetailCols = [
+		{ key: 'code', label: 'Kode' },
+		{ key: 'name', label: 'Nama' }
+	];
+	function openDetail(item: Record<string, unknown>) {
+		detailItem = item;
+		detailDialogOpen = true;
+	}
 </script>
 
 <div>
@@ -68,11 +80,15 @@
 			</Table.Header>
 			<Table.Body>
 				{#each data.units as unit, i}
-					<Table.Row>
+					<Table.Row class="cursor-pointer" onclick={() => openDetail(unit as unknown as Record<string, unknown>)}>
 						<Table.Cell class="text-center text-muted-foreground">{i + 1}</Table.Cell>
-						<Table.Cell class="font-medium">{unit.code}</Table.Cell>
+						<Table.Cell class="font-medium">
+							<div class="min-w-[300px] max-w-[380px]">
+								<CodeTooltip value={unit.code} />
+							</div>
+						</Table.Cell>
 						<Table.Cell>{unit.name}</Table.Cell>
-						<Table.Cell>
+						<Table.Cell onclick={(e: MouseEvent) => e.stopPropagation()}>
 							<div class="flex justify-center gap-1">
 								<Button variant="ghost" size="icon" onclick={() => { editItem = { ...unit }; editDialogOpen = true; }}>
 									<Pencil class="h-4 w-4" />
@@ -89,6 +105,8 @@
 			</Table.Body>
 		</Table.Root>
 	</div>
+
+	<DetailDialog bind:open={detailDialogOpen} title="Detail Unit" columns={unitDetailCols} item={detailItem} />
 
 	<Dialog.Root bind:open={editDialogOpen}>
 		<Dialog.Content>
