@@ -8,6 +8,7 @@
 	import * as Dialog from '$lib/components/shadcn-ui/dialog/index.js';
 	import { Input } from '$lib/components/shadcn-ui/input/index.js';
 	import { Label } from '$lib/components/shadcn-ui/label/index.js';
+	import * as Select from '$lib/components/shadcn-ui/select/index.js';
 	import { Plus, Search, X, ChevronLeft, ChevronRight, Pencil, QrCode, DoorOpen } from '@lucide/svelte';
 	import QrCodeDialog from '../../../app/components/QrCodeDialog.svelte';
 	import DeleteDialog from '../../../app/components/DeleteDialog.svelte';
@@ -36,6 +37,10 @@
 	let jumpValue = $state('');
 	let detailDialogOpen = $state(false);
 	let detailItem = $state<Record<string, unknown> | null>(null);
+	let createBuildingCode = $state('');
+	let editBuildingCode = $state('');
+	const createBuildingLabel = $derived(data.buildings.find((b) => b.code === createBuildingCode)?.description ?? 'Pilih Gedung');
+	const editBuildingLabel = $derived(data.buildings.find((b) => b.code === editBuildingCode)?.description ?? 'Pilih Gedung');
 	function openDetail(item: Record<string, unknown>) {
 		detailItem = item;
 		detailDialogOpen = true;
@@ -136,12 +141,14 @@
 					</div>
 					<div class="space-y-1.5">
 						<Label for="building_code">Gedung</Label>
-						<select name="building_code" id="building_code" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-							<option value="">-- Pilih Gedung --</option>
-							{#each data.buildings as b}
-								<option value={b.code}>{b.description}</option>
-							{/each}
-						</select>
+						<Select.Root type="single" name="building_code" bind:value={createBuildingCode}>
+							<Select.Trigger id="building_code" class="w-full">{createBuildingLabel}</Select.Trigger>
+							<Select.Content>
+								{#each data.buildings as b}
+									<Select.Item value={b.code} label={b.description}>{b.description}</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
 					</div>
 					<div class="flex justify-end gap-2 pt-3">
 						<Button variant="outline" type="button" onclick={() => { createDialogOpen = false; }}>Batal</Button>
@@ -199,7 +206,7 @@
 						</Table.Cell>
 						<Table.Cell onclick={(e: MouseEvent) => e.stopPropagation()}>
 							<div class="flex justify-center gap-1">
-								<Button variant="ghost" size="icon" onclick={() => { editItem = { ...item }; editDialogOpen = true; }}>
+								<Button variant="ghost" size="icon" onclick={() => { editItem = { ...item }; editBuildingCode = String(item.building_code ?? ''); editDialogOpen = true; }}>
 									<Pencil class="h-4 w-4" />
 								</Button>
 								<DeleteDialog id={item.id} message="Apakah Anda yakin ingin menghapus ruangan ini?" />
@@ -262,12 +269,14 @@
 				</div>
 				<div class="space-y-1.5">
 					<Label for="edit-building_code">Gedung</Label>
-					<select name="building_code" id="edit-building_code" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-						<option value="">-- Pilih Gedung --</option>
-						{#each data.buildings as b}
-							<option value={b.code} selected={b.code === editItem.building_code}>{b.description}</option>
-						{/each}
-					</select>
+					<Select.Root type="single" name="building_code" bind:value={editBuildingCode}>
+						<Select.Trigger id="edit-building_code" class="w-full">{editBuildingLabel}</Select.Trigger>
+						<Select.Content>
+							{#each data.buildings as b}
+								<Select.Item value={b.code} label={b.description}>{b.description}</Select.Item>
+							{/each}
+						</Select.Content>
+					</Select.Root>
 				</div>
 				<div class="flex justify-end gap-2 pt-3">
 					<Button variant="outline" type="button" onclick={() => { editDialogOpen = false; }}>Batal</Button>

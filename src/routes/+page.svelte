@@ -2,6 +2,9 @@
 	import RoomCard from '../app/components/RoomCard.svelte';
 	import { Archive, CircleCheck, AlertTriangle, CircleX } from '@lucide/svelte';
 	import { formatRupiah } from '$lib/format.js';
+	import { goto } from '$app/navigation';
+	import { Label } from '$lib/components/shadcn-ui/label/index.js';
+	import * as Select from '$lib/components/shadcn-ui/select/index.js';
 
 	let { data } = $props();
 
@@ -17,40 +20,43 @@
 
 <!-- Hero section -->
 <div class="relative overflow-hidden border-b bg-gradient-to-br from-primary/5 via-background to-primary/3">
-	<div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(120,119,198,0.12),transparent)]"></div>
-	<div class="relative mx-auto max-w-[1400px] px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-		<div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+	<div class="relative mx-auto container px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+		<div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between mb-5">
 			<div>
-				<h1 class="text-3xl font-bold tracking-tight sm:text-4xl">Dashboard Inventaris</h1>
+				<h1 class="text-2xl font-bold tracking-tight sm:text-4xl">Dashboard Inventaris</h1>
 			</div>
 
 			{#if data.dates.length > 0}
-				<form class="flex items-center gap-2.5">
-					<label
-						for="inspection_date"
-						class="text-sm font-medium text-muted-foreground whitespace-nowrap"
-					>
+				<div class="flex items-center gap-2.5">
+					<Label for="inspection-date" class="text-sm text-muted-foreground whitespace-nowrap">
 						Tanggal Inspeksi
-					</label>
-					<select
-						id="inspection_date"
-						name="inspection-date"
-						class="w-56 rounded-lg border border-input bg-card px-3.5 py-2 text-sm shadow-sm transition-colors focus:border-primary focus:ring-1 focus:ring-primary"
-						onchange={(e) => {
-							(e.currentTarget as HTMLSelectElement).form?.submit();
+					</Label>
+					<Select.Root
+						type="single"
+						value={data.selectedDate}
+						onValueChange={(v) => {
+							if (v && v !== data.selectedDate) {
+								goto(`/?inspection-date=${encodeURIComponent(v)}`);
+							}
 						}}
 					>
-						{#each data.dates as d}
-							<option value={d.date} selected={d.date === data.selectedDate}>{d.date}</option>
-						{/each}
-					</select>
-				</form>
+						<Select.Trigger id="inspection-date" class="w-56">{data.selectedDate || 'Pilih tanggal'}</Select.Trigger>
+						<Select.Content>
+							{#each data.dates as d}
+								<Select.Item value={d.date} label={d.date}>{d.date}</Select.Item>
+							{/each}
+						</Select.Content>
+					</Select.Root>
+				</div>
 			{/if}
 		</div>
 
 		<!-- Summary stats -->
 		{#if data.summaries.length > 0}
-			<div class="mt-8 grid grid-cols-1 gap-3 font-heading md:grid-cols-2 lg:grid-cols-4">
+			<div class="flex items-center justify-between">
+				<h2 class="text-lg font-semibold">Keseluruhan</h2>
+			</div>
+			<div class="grid grid-cols-1 gap-3 font-heading md:grid-cols-2 lg:grid-cols-4 mb-10">
 				<a href="/inspection?inspection-date={data.selectedDate}" class="group relative overflow-hidden rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-800 p-5 shadow-lg shadow-primary/25 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/30">
 					<Archive class="absolute top-3 right-3 h-16 w-16 text-white/20 transition-all duration-300 group-hover:scale-110 group-hover:text-white/35" />
 					<p class="text-sm font-medium uppercase tracking-wider text-primary-foreground/70 transition-colors duration-300 group-hover:text-white">Semua Item</p>
@@ -77,26 +83,24 @@
 				</a>
 			</div>
 		{/if}
-	</div>
-</div>
 
-<!-- Room cards -->
-<div class="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
-	{#if data.summaries.length === 0}
-		<div class="flex flex-col items-center justify-center rounded-xl border-2 border-dashed py-20">
-			<Archive class="h-12 w-12 text-muted-foreground/40" />
-			<p class="mt-4 text-base font-medium text-muted-foreground">Belum ada data inspeksi</p>
-			<p class="mt-1 text-sm text-muted-foreground/70">Upload data melalui menu admin untuk memulai.</p>
-		</div>
-	{:else}
-		<div class="mb-5 flex items-center justify-between">
-			<h2 class="text-lg font-semibold">Per Ruangan</h2>
-			<span class="text-xs text-muted-foreground">{data.summaries.length} ruangan</span>
-		</div>
-		<div class="grid gap-4 lg:grid-cols-2">
-			{#each data.summaries as summary}
-				<RoomCard {summary} inspectionDate={data.selectedDate} />
-			{/each}
-		</div>
-	{/if}
+			
+		{#if data.summaries.length === 0}
+			<div class="flex flex-col items-center justify-center rounded-xl border-2 border-dashed py-20">
+				<Archive class="h-12 w-12 text-muted-foreground/40" />
+				<p class="mt-4 text-base font-medium text-muted-foreground">Belum ada data inspeksi</p>
+				<p class="mt-1 text-sm text-muted-foreground/70">Upload data melalui menu admin untuk memulai.</p>
+			</div>
+		{:else}
+			<div class="mb-5 flex items-center justify-between">
+				<h2 class="text-lg font-semibold">Per Ruangan</h2>
+				<span class="text-xs text-muted-foreground">{data.summaries.length} ruangan</span>
+			</div>
+			<div class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 w-full">
+				{#each data.summaries as summary}
+					<RoomCard {summary} inspectionDate={data.selectedDate} />
+				{/each}
+			</div>
+		{/if}
+	</div>
 </div>

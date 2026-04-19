@@ -70,7 +70,7 @@
 	}
 </script>
 
-<div class="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
+<div class="mx-auto container px-4 py-8 sm:px-6 lg:px-8">
 	<div class="mb-6 flex items-center justify-between gap-4">
 		<div class="shrink-0">
 			<h1 class="flex items-center gap-2 text-2xl font-bold tracking-tight"><DoorOpen class="h-6 w-6" /> Ruangan</h1>
@@ -79,7 +79,7 @@
 			<Input
 				placeholder="Cari..."
 				bind:value={searchValue}
-				class="pr-16"
+				class="pr-16 bg-white"
 			/>
 			{#if searchValue}
 				<button type="button" onclick={() => { searchValue = ''; goto(buildUrl({ search: '', page: '' })); }} class="absolute right-9 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
@@ -96,7 +96,7 @@
 		<Table.Root>
 			<Table.Header>
 				<Table.Row class="bg-muted/40 hover:bg-muted/40">
-					<Table.Head class="w-[60px] text-center font-semibold">No</Table.Head>
+					<Table.Head class="w-[60px] text-center font-semibold pt-4 pb-4">No</Table.Head>
 					<Table.Head class="font-semibold">Kode</Table.Head>
 					<Table.Head class="font-semibold">Nama</Table.Head>
 					<Table.Head class="font-semibold {spaceIsNumeric ? 'text-right' : ''}">Luas</Table.Head>
@@ -109,7 +109,7 @@
 					<Table.Row class="cursor-pointer" onclick={() => openDetail(item)}>
 						<Table.Cell class="text-center text-muted-foreground">{(data.page - 1) * data.pageSize + i + 1}</Table.Cell>
 						<Table.Cell>
-							<div class="min-w-[300px] max-w-[380px]">
+							<div class="min-w-[300px] max-w-[520px]">
 								<CodeTooltip value={item.code as string | null | undefined} />
 							</div>
 						</Table.Cell>

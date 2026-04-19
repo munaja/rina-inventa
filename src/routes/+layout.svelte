@@ -15,7 +15,7 @@
 		{@render children()}
 	</main>
 	<footer class="border-t bg-muted/30">
-		<div class="mx-auto flex max-w-[1400px] items-center justify-center gap-3 px-4 py-5 sm:px-6 lg:px-8">
+		<div class="mx-auto flex container items-center justify-center gap-3 px-4 py-5 sm:px-6 lg:px-8">
 			<p class="text-xs text-muted-foreground">
 				&copy; {new Date().getFullYear()} Sistem Inventaris. Semua hak dilindungi.
 			</p>

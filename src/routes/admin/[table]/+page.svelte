@@ -13,7 +13,7 @@
 	import DeleteDialog from '../../../app/components/DeleteDialog.svelte';
 	import CodeTooltip from '../../../app/components/CodeTooltip.svelte';
 	import DetailDialog from '../../../app/components/DetailDialog.svelte';
-	import { isNumericColumn, isCodeColumn } from '$lib/format.js';
+	import { isNumericColumn, isCodeColumn, formatIDNumber } from '$lib/format.js';
 
 	const tableIcons: Record<string, typeof Wrench> = {
 		'tool-machine': Wrench,
@@ -37,7 +37,12 @@
 	let detailDialogOpen = $state(false);
 	let detailItem = $state<Record<string, unknown> | null>(null);
 
-	const tableCols = $derived(data.tableDef.columns.filter((c: { showInTable?: boolean }) => c.showInTable !== false));
+	const tableCols = $derived.by(() => {
+		const cols = data.tableDef.columns.filter((c: { showInTable?: boolean }) => c.showInTable !== false);
+		const idx = cols.findIndex((c: { key: string }) => c.key === 'acquisitionValue');
+		if (idx === -1) return cols;
+		return [...cols.slice(0, idx), ...cols.slice(idx + 1), cols[idx]];
+	});
 	const allCols = $derived(data.tableDef.columns);
 	const numericKeys = $derived(new Set(tableCols.filter((c: { key: string }) => isNumericColumn(data.items, c.key)).map((c: { key: string }) => c.key)));
 
@@ -274,6 +279,8 @@
 										<div class="min-w-[300px] max-w-[380px]">
 											<CodeTooltip value={item[col.key] as string | number | null | undefined} />
 										</div>
+									{:else if col.key === 'acquisitionValue'}
+										<div class="truncate">{formatIDNumber(item[col.key])}</div>
 									{:else if col.key === 'description'}
 										<div class="whitespace-normal">{item[col.key] ?? '-'}</div>
 									{:else}

@@ -9,7 +9,8 @@
 	import { Badge } from '$lib/components/shadcn-ui/badge/index.js';
 	import { Input } from '$lib/components/shadcn-ui/input/index.js';
 	import { Label } from '$lib/components/shadcn-ui/label/index.js';
-	import { Plus, Upload, ChevronLeft, ChevronRight, Pencil, Trash2, Image, ClipboardCheck } from '@lucide/svelte';
+	import * as Select from '$lib/components/shadcn-ui/select/index.js';
+	import { Plus, Upload, ChevronLeft, ChevronRight, Pencil, Image, ClipboardCheck } from '@lucide/svelte';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import ImageDialog from '../../../app/components/ImageDialog.svelte';
 	import DeleteDialog from '../../../app/components/DeleteDialog.svelte';
@@ -28,6 +29,29 @@
 	let searchValue = $state(data.search || '');
 	let detailDialogOpen = $state(false);
 	let detailItem = $state<Record<string, unknown> | null>(null);
+
+	let createRoomId = $state('');
+	let createCondition = $state('');
+	let editRoomId = $state('');
+	let editCondition = $state('');
+	let filterDate = $state(data.inspectionDate ?? '');
+	let filterRoom = $state(data.roomId ?? '');
+	let filterCondition = $state(data.condition ?? '');
+
+	const conditionOptions = [
+		{ value: 'Baik', label: 'Baik' },
+		{ value: 'Rusak Ringan', label: 'Rusak Ringan' },
+		{ value: 'Rusak Berat', label: 'Rusak Berat' }
+	];
+	const roomLabel = (id: string) => data.rooms.find((r) => String(r.id) === id)?.name ?? 'Pilih Ruangan';
+	const conditionLabel = (v: string) => conditionOptions.find((c) => c.value === v)?.label ?? 'Kondisi';
+	const createRoomLabel = $derived(roomLabel(createRoomId));
+	const createConditionLabel = $derived(conditionLabel(createCondition));
+	const editRoomLabel = $derived(roomLabel(editRoomId));
+	const editConditionLabel = $derived(conditionLabel(editCondition));
+	const filterDateLabel = $derived(filterDate || 'Semua');
+	const filterRoomLabel = $derived(data.rooms.find((r) => String(r.id) === filterRoom)?.name ?? 'Semua');
+	const filterConditionLabel = $derived(conditionOptions.find((c) => c.value === filterCondition)?.label ?? 'Semua');
 	const inspectionDetailCols = [
 		{ key: 'toolMachine_code', label: 'Code' },
 		{ key: 'toolMachineName', label: 'Name' },
@@ -87,24 +111,28 @@
 					<form method="POST" action="?/create" use:enhance={() => { return async ({ update, result }) => { await update(); if (result.type === 'success') createDialogOpen = false; }; }} class="space-y-3">
 						<div class="space-y-1.5">
 							<Label for="create-room_id">Ruangan</Label>
-							<select name="room_id" id="create-room_id" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-								<option value="">-- Pilih Ruangan --</option>
-								{#each data.rooms as room}
-									<option value={room.id}>{room.name}</option>
-								{/each}
-							</select>
+							<Select.Root type="single" name="room_id" bind:value={createRoomId}>
+								<Select.Trigger id="create-room_id" class="w-full">{createRoomLabel}</Select.Trigger>
+								<Select.Content>
+									{#each data.rooms as room}
+										<Select.Item value={String(room.id)} label={room.name}>{room.name}</Select.Item>
+									{/each}
+								</Select.Content>
+							</Select.Root>
 						</div>
 						<div class="space-y-1.5"><Label for="create-code">Code</Label><Input id="create-code" name="toolMachine_code" /></div>
 						<div class="space-y-1.5"><Label for="create-description">Description</Label><Input id="create-description" name="description" /></div>
 						<div class="space-y-1.5"><Label for="create-brandType">Brand/Type</Label><Input id="create-brandType" name="brandType" /></div>
 						<div class="space-y-1.5">
 							<Label for="create-condition">Condition</Label>
-							<select name="condition" id="create-condition" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-								<option value="">-- Kondisi --</option>
-								<option value="Baik">Baik</option>
-								<option value="Rusak Ringan">Rusak Ringan</option>
-								<option value="Rusak Berat">Rusak Berat</option>
-							</select>
+							<Select.Root type="single" name="condition" bind:value={createCondition}>
+								<Select.Trigger id="create-condition" class="w-full">{createConditionLabel}</Select.Trigger>
+								<Select.Content>
+									{#each conditionOptions as c}
+										<Select.Item value={c.value} label={c.label}>{c.label}</Select.Item>
+									{/each}
+								</Select.Content>
+							</Select.Root>
 						</div>
 						<div class="space-y-1.5"><Label for="create-remarks">Remarks</Label><Input id="create-remarks" name="remarks" /></div>
 						<div class="flex justify-end gap-2 pt-3">
@@ -182,37 +210,46 @@
 	{/if}
 
 	<!-- Filters -->
-	<form class="mb-6 rounded-xl border bg-card p-4 shadow-sm" onsubmit={(e) => { e.preventDefault(); goto(buildUrl({ search: searchValue, inspection_date: (document.getElementById('filter-date') as HTMLSelectElement).value, 'room-id': (document.getElementById('filter-room') as HTMLSelectElement).value, condition: (document.getElementById('filter-condition') as HTMLSelectElement).value, page: '' })); }}>
+	<form class="mb-6 rounded-xl border bg-card p-4 shadow-sm" onsubmit={(e) => { e.preventDefault(); goto(buildUrl({ search: searchValue, inspection_date: filterDate, 'room-id': filterRoom, condition: filterCondition, page: '' })); }}>
 		<div class="flex flex-wrap items-end gap-3">
 			<div class="w-40">
-				<label for="filter-date" class="mb-1.5 block text-xs font-medium text-muted-foreground">Tanggal</label>
-				<select id="filter-date" class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-					<option value="">Semua</option>
-					{#each data.dates as date}
-						<option value={date} selected={date === data.inspectionDate}>{date}</option>
-					{/each}
-				</select>
+				<Label for="filter-date" class="mb-1.5 text-xs text-muted-foreground">Tanggal</Label>
+				<Select.Root type="single" bind:value={filterDate}>
+					<Select.Trigger id="filter-date" class="w-full">{filterDateLabel}</Select.Trigger>
+					<Select.Content>
+						<Select.Item value="" label="Semua">Semua</Select.Item>
+						{#each data.dates as date}
+							<Select.Item value={date} label={date}>{date}</Select.Item>
+						{/each}
+					</Select.Content>
+				</Select.Root>
 			</div>
 			<div class="w-44">
-				<label for="filter-room" class="mb-1.5 block text-xs font-medium text-muted-foreground">Ruangan</label>
-				<select id="filter-room" class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-					<option value="">Semua</option>
-					{#each data.rooms as room}
-						<option value={room.id} selected={String(room.id) === data.roomId}>{room.name}</option>
-					{/each}
-				</select>
+				<Label for="filter-room" class="mb-1.5 text-xs text-muted-foreground">Ruangan</Label>
+				<Select.Root type="single" bind:value={filterRoom}>
+					<Select.Trigger id="filter-room" class="w-full">{filterRoomLabel}</Select.Trigger>
+					<Select.Content>
+						<Select.Item value="" label="Semua">Semua</Select.Item>
+						{#each data.rooms as room}
+							<Select.Item value={String(room.id)} label={room.name}>{room.name}</Select.Item>
+						{/each}
+					</Select.Content>
+				</Select.Root>
 			</div>
 			<div class="w-36">
-				<label for="filter-condition" class="mb-1.5 block text-xs font-medium text-muted-foreground">Kondisi</label>
-				<select id="filter-condition" class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-					<option value="">Semua</option>
-					<option value="Baik" selected={data.condition === 'Baik'}>Baik</option>
-					<option value="Rusak Ringan" selected={data.condition === 'Rusak Ringan'}>Rusak Ringan</option>
-					<option value="Rusak Berat" selected={data.condition === 'Rusak Berat'}>Rusak Berat</option>
-				</select>
+				<Label for="filter-condition" class="mb-1.5 text-xs text-muted-foreground">Kondisi</Label>
+				<Select.Root type="single" bind:value={filterCondition}>
+					<Select.Trigger id="filter-condition" class="w-full">{filterConditionLabel}</Select.Trigger>
+					<Select.Content>
+						<Select.Item value="" label="Semua">Semua</Select.Item>
+						{#each conditionOptions as c}
+							<Select.Item value={c.value} label={c.label}>{c.label}</Select.Item>
+						{/each}
+					</Select.Content>
+				</Select.Root>
 			</div>
 			<div class="min-w-[150px] flex-1">
-				<label for="filter-search" class="mb-1.5 block text-xs font-medium text-muted-foreground">Cari</label>
+				<Label for="filter-search" class="mb-1.5 text-xs text-muted-foreground">Cari</Label>
 				<Input id="filter-search" placeholder="Cari kode, deskripsi, brand..." bind:value={searchValue} />
 			</div>
 			<div class="flex gap-2">
@@ -266,7 +303,7 @@
 							</Table.Cell>
 							<Table.Cell onclick={(e: MouseEvent) => e.stopPropagation()}>
 								<div class="flex justify-center gap-1">
-									<Button variant="ghost" size="icon" onclick={() => { editItem = { ...item }; editDialogOpen = true; }}>
+									<Button variant="ghost" size="icon" onclick={() => { editItem = { ...item }; editRoomId = item.room_id != null ? String(item.room_id) : ''; editCondition = item.condition != null ? String(item.condition) : ''; editDialogOpen = true; }}>
 										<Pencil class="h-4 w-4" />
 									</Button>
 									<DeleteDialog id={item.id} message="Apakah Anda yakin ingin menghapus data inspeksi ini?" />
@@ -307,24 +344,28 @@
 				<input type="hidden" name="id" value={editItem.id} />
 				<div class="space-y-1.5">
 					<Label for="edit-room_id">Ruangan</Label>
-					<select name="room_id" id="edit-room_id" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-						<option value="">-- Pilih Ruangan --</option>
-						{#each data.rooms as room}
-							<option value={room.id} selected={room.id === editItem.room_id}>{room.name}</option>
-						{/each}
-					</select>
+					<Select.Root type="single" name="room_id" bind:value={editRoomId}>
+						<Select.Trigger id="edit-room_id" class="w-full">{editRoomLabel}</Select.Trigger>
+						<Select.Content>
+							{#each data.rooms as room}
+								<Select.Item value={String(room.id)} label={room.name}>{room.name}</Select.Item>
+							{/each}
+						</Select.Content>
+					</Select.Root>
 				</div>
 				<div class="space-y-1.5"><Label for="edit-code">Code</Label><Input id="edit-code" name="toolMachine_code" value={String(editItem.toolMachine_code ?? '')} /></div>
 				<div class="space-y-1.5"><Label for="edit-description">Description</Label><Input id="edit-description" name="description" value={String(editItem.description ?? '')} /></div>
 				<div class="space-y-1.5"><Label for="edit-brandType">Brand/Type</Label><Input id="edit-brandType" name="brandType" value={String(editItem.brandType ?? '')} /></div>
 				<div class="space-y-1.5">
 					<Label for="edit-condition">Condition</Label>
-					<select name="condition" id="edit-condition" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-						<option value="">-- Kondisi --</option>
-						<option value="Baik" selected={editItem.condition === 'Baik'}>Baik</option>
-						<option value="Rusak Ringan" selected={editItem.condition === 'Rusak Ringan'}>Rusak Ringan</option>
-						<option value="Rusak Berat" selected={editItem.condition === 'Rusak Berat'}>Rusak Berat</option>
-					</select>
+					<Select.Root type="single" name="condition" bind:value={editCondition}>
+						<Select.Trigger id="edit-condition" class="w-full">{editConditionLabel}</Select.Trigger>
+						<Select.Content>
+							{#each conditionOptions as c}
+								<Select.Item value={c.value} label={c.label}>{c.label}</Select.Item>
+							{/each}
+						</Select.Content>
+					</Select.Root>
 				</div>
 				<div class="space-y-1.5"><Label for="edit-remarks">Remarks</Label><Input id="edit-remarks" name="remarks" value={String(editItem.remarks ?? '')} /></div>
 				<div class="flex justify-end gap-2 pt-3">

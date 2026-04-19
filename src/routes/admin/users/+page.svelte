@@ -8,6 +8,7 @@
 	import { Badge } from '$lib/components/shadcn-ui/badge/index.js';
 	import { Input } from '$lib/components/shadcn-ui/input/index.js';
 	import { Label } from '$lib/components/shadcn-ui/label/index.js';
+	import * as Select from '$lib/components/shadcn-ui/select/index.js';
 	import { Plus, KeyRound, Users } from '@lucide/svelte';
 	import DeleteDialog from '../../../app/components/DeleteDialog.svelte';
 
@@ -16,6 +17,12 @@
 	let resetDialogOpen = $state(false);
 	let resetUserId = $state(0);
 	let resetUsername = $state('');
+	let createRole = $state('operator');
+	const roleOptions = [
+		{ value: 'operator', label: 'Operator' },
+		{ value: 'admin', label: 'Admin' }
+	];
+	const createRoleLabel = $derived(roleOptions.find((o) => o.value === createRole)?.label ?? 'Pilih role');
 </script>
 
 <div>
@@ -43,10 +50,14 @@
 					</div>
 					<div class="space-y-1.5">
 						<Label for="role">Role</Label>
-						<select name="role" id="role" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-							<option value="operator">Operator</option>
-							<option value="admin">Admin</option>
-						</select>
+						<Select.Root type="single" name="role" bind:value={createRole}>
+							<Select.Trigger id="role" class="w-full">{createRoleLabel}</Select.Trigger>
+							<Select.Content>
+								{#each roleOptions as o}
+									<Select.Item value={o.value} label={o.label}>{o.label}</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
 					</div>
 					<div class="flex justify-end gap-2 pt-3">
 						<Button variant="outline" type="button" onclick={() => { createDialogOpen = false; }}>Batal</Button>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/shadcn-ui/dialog/index.js';
+	import { formatIDNumber } from '$lib/format.js';
 
 	type Col = { key: string; label: string };
 	let {
@@ -14,7 +15,8 @@
 		item: Record<string, unknown> | null;
 	} = $props();
 
-	function display(val: unknown): string {
+	function display(col: Col, val: unknown): string {
+		if (col.key === 'acquisitionValue') return formatIDNumber(val);
 		if (val == null || val === '') return '-';
 		return String(val);
 	}
@@ -30,7 +32,7 @@
 				{#each columns as col}
 					<div class="grid grid-cols-[160px_1fr] gap-3 py-2">
 						<dt class="text-muted-foreground">{col.label}</dt>
-						<dd class="break-words">{display(item[col.key])}</dd>
+						<dd class="break-words">{display(col, item[col.key])}</dd>
 					</div>
 				{/each}
 			</dl>

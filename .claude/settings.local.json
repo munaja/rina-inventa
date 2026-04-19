@@ -32,7 +32,9 @@
       "Bash(npx svelte-check:*)",
       "Bash(pnpm exec:*)",
       "Bash(pnpm install:*)",
-      "Bash(git stash *)"
+      "Bash(git stash *)",
+      "Bash(grep -n 'max-w-\\\\\\\\\\\\[1400px\\\\\\\\\\\\]' \"C:/Users/munaja/AppData/Local/Temp/page.html\")",
+      "Bash(kill %1)"
     ]
   }
 }

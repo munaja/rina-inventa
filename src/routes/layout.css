@@ -8,6 +8,10 @@
   --font-heading: 'Quicksand Variable', ui-sans-serif, system-ui, sans-serif;
 }
 
+@theme {
+  --breakpoint-2xl: 87.5rem;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 :root {

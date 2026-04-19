@@ -8,7 +8,7 @@
 	import CodeTooltip from '../../../app/components/CodeTooltip.svelte';
 	import DetailDialog from '../../../app/components/DetailDialog.svelte';
 
-	import { isNumericColumn, isCodeColumn } from '$lib/format.js';
+	import { isNumericColumn, isCodeColumn, formatIDNumber } from '$lib/format.js';
 
 	const tableIcons: Record<string, typeof Wrench> = {
 		'tool-machine': Wrench,
@@ -24,7 +24,12 @@
 	let { data } = $props();
 	const TableIcon = $derived(tableIcons[data.slug]);
 
-	const tableCols = $derived(data.tableDef.columns.filter((c: { showInTable?: boolean }) => c.showInTable !== false));
+	const tableCols = $derived.by(() => {
+		const cols = data.tableDef.columns.filter((c: { showInTable?: boolean }) => c.showInTable !== false);
+		const idx = cols.findIndex((c: { key: string }) => c.key === 'acquisitionValue');
+		if (idx === -1) return cols;
+		return [...cols.slice(0, idx), ...cols.slice(idx + 1), cols[idx]];
+	});
 	const allCols = $derived(data.tableDef.columns);
 	const numericKeys = $derived(new Set(tableCols.filter((c: { key: string }) => isNumericColumn(data.items, c.key)).map((c: { key: string }) => c.key)));
 
@@ -78,7 +83,7 @@
 	}
 </script>
 
-<div class="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
+<div class="mx-auto container px-4 py-8 sm:px-6 lg:px-8">
 	<!-- Header -->
 	<div class="mb-6 flex items-center justify-between gap-4">
 		<div class="shrink-0">
@@ -88,7 +93,7 @@
 			<Input
 				placeholder="Cari..."
 				bind:value={searchValue}
-				class="pr-16"
+				class="pr-16 bg-white"
 			/>
 			{#if searchValue}
 				<button type="button" onclick={() => { searchValue = ''; goto(buildUrl({ search: '', page: '' })); }} class="absolute right-9 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
@@ -106,8 +111,8 @@
 		<div class="overflow-x-auto">
 			<Table.Root>
 				<Table.Header>
-					<Table.Row class="bg-muted/40 hover:bg-muted/40">
-						<Table.Head class="w-[60px] text-center font-semibold">No</Table.Head>
+					<Table.Row class="bg-muted/80 hover:bg-muted">
+						<Table.Head class="w-[60px] text-center font-semibold pt-4 pb-4">No</Table.Head>
 						{#each tableCols as col}
 							<Table.Head class="font-semibold {colAlign(col)}">{col.label}</Table.Head>
 						{/each}
@@ -123,6 +128,8 @@
 										<div class="min-w-[300px] max-w-[380px]">
 											<CodeTooltip value={item[col.key] as string | number | null | undefined} />
 										</div>
+									{:else if col.key === 'acquisitionValue'}
+										<div class="truncate">{formatIDNumber(item[col.key])}</div>
 									{:else if col.key === 'description'}
 										<div class="whitespace-normal">{item[col.key] ?? '-'}</div>
 									{:else}
@@ -153,21 +160,21 @@
 		{#if data.totalPages > 1}
 			<div class="flex items-center gap-3">
 				<div class="flex gap-1">
-					<Button variant="outline" size="sm" href={buildUrl({ page: data.page - 1 })} disabled={data.page <= 1}>
+					<Button variant="outline" size="sm" href={buildUrl({ page: data.page - 1 })} disabled={data.page <= 1} class="bg-white">
 						<ChevronLeft class="h-4 w-4" />
 					</Button>
 					{#each pageButtons as p}
-						<Button variant={p === data.page ? 'default' : 'outline'} size="sm" href={buildUrl({ page: p })} class="w-9">
+						<Button variant={p === data.page ? 'default' : 'outline'} size="sm" href={buildUrl({ page: p })} class={`w-9 ${p === data.page ? '' : 'bg-white'}`}>
 							{p}
 						</Button>
 					{/each}
-					<Button variant="outline" size="sm" href={buildUrl({ page: data.page + 1 })} disabled={data.page >= data.totalPages}>
+					<Button variant="outline" size="sm" href={buildUrl({ page: data.page + 1 })} disabled={data.page >= data.totalPages} class="bg-white">
 						<ChevronRight class="h-4 w-4" />
 					</Button>
 				</div>
-				<form onsubmit={(e) => { e.preventDefault(); handleJump(); }} class="flex items-center gap-1.5">
+				<form onsubmit={(e) => { e.preventDefault(); handleJump(); }} class="flex items-center gap-1.5 ">
 					<span class="text-sm text-muted-foreground whitespace-nowrap">Jump to</span>
-					<Input bind:value={jumpValue} class="h-8 w-16 text-center text-sm" placeholder="#" />
+					<Input bind:value={jumpValue} class="h-8 w-16 text-center bg-white" placeholder="#" />
 				</form>
 			</div>
 		{/if}

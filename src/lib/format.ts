@@ -1,3 +1,14 @@
+/** Format a numeric value with id-ID thousand separators (e.g. 8200000 → "8.200.000"). */
+export function formatIDNumber(v: unknown): string {
+	if (v === null || v === undefined || v === '') return '-';
+	const s = String(v).trim();
+	if (!s) return '-';
+	const normalized = s.replace(/\./g, '').replace(',', '.');
+	const n = Number(normalized);
+	if (!Number.isFinite(n)) return s;
+	return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(n);
+}
+
 export function formatRupiah(n: number): string {
 	return new Intl.NumberFormat('id-ID', {
 		style: 'currency',
