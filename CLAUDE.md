@@ -64,6 +64,6 @@ resources/               # Source Excel files
 
 ## Database
 
-- Schema: `src/lib/server/schema.sql`
+- Schema: `db-migration/schema.sql`
 - Default admin: `admin` / `admin`
 - Session-based auth with 7-day cookie expiry
